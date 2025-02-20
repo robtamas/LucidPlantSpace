@@ -9,13 +9,21 @@
 After pulling the repo, run the following: 
 
 ```
-docker build --no-cache -t yolo-api .
+docker build --no-cache -t lucidplantspace .
 ```
 
-then run the server
+
+By default running the following will kick off training of the model from the `/data` folder  if you want to train a specific model, download and unzip to this directory.
 
 ```
-docker run -p 8000:8000 yolo-api
+docker run -p 8000:8000 lucidplantspace
+```
+
+
+Alternatively to just run the server:
+
+```
+docker run -p 8000:8000 lucidplantspace serve
 ```
 
 Once running, requests can be made via the command line:
