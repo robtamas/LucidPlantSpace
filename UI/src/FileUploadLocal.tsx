@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 
-function FileUpload() {
+function FileUploadLocal() {
   const [image, setImage] = useState(null);
   const [response, setResponse] = useState("");
 
@@ -30,7 +30,7 @@ function FileUpload() {
       .then((data) => {
         const jsonString = JSON.stringify(data, null, 2);
         console.log(jsonString);
-        setResponse(jsonString); // Set response data
+        setResponse(jsonString);
       })
       .catch(() => alert("Upload failed"));
   };
@@ -52,4 +52,4 @@ function FileUpload() {
   );
 }
 
-export default FileUpload;
+export default FileUploadLocal;
