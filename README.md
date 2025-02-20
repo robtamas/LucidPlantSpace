@@ -38,3 +38,22 @@ curl -X 'POST' \
   -F 'file=@<path_to_image.jpg> '
 ```
 
+## To test on a device
+
+Create a Personal Hotspot connection to your device, then run the following command
+
+```
+npm run dev -- --host
+```
+
+The following will be displayed which will show addresses that are exposed to the local network: 
+
+```
+ VITE v6.1.1  ready in 61 ms
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: http://172.20.10.3:5173/
+  ➜  Network: http://192.168.64.1:5173/
+  ➜  press h + enter to show help
+```
+
