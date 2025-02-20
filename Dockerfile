@@ -29,5 +29,5 @@ ENTRYPOINT ["/app/entrypoint.sh"]
 EXPOSE 8000
 
 # Default command: training mode
-CMD ["train", "--data=/app/data/data.yaml", "--model=yolov8n.pt", "--epochs=1", "--imgsz=640"]
+CMD ["train", "--data=/app/data/data.yaml", "--model=yolov8n.pt", "--epochs=10", "--imgsz=640"]
 
