@@ -5,6 +5,7 @@ from fastapi.responses import StreamingResponse
 from datetime import datetime
 import io
 import base64
+import cv2
 
 app = FastAPI()
 
@@ -22,7 +23,7 @@ async def detect_objects(file: UploadFile = File(...)):
         results = model(image)
 
         confidence_threshold = 0.5 # Set confidence threshold for detection
-        desired_class = "bowl" # Set desired class for detection
+        # desired_class = "bowl" # Set desired class for detection
         current_time = datetime.now().isoformat()
 
         # All detections with confidence above threshold
@@ -40,7 +41,7 @@ async def detect_objects(file: UploadFile = File(...)):
 
         # Plot the results on the image
         annotated_image = result.plot()  # result.plot() should return a NumPy array
-        annotated_pil_image = Image.fromarray(annotated_image)
+        annotated_pil_image = Image.fromarray(cv2.cvtColor(annotated_image, cv2.COLOR_BGR2RGB))
 
         # Save the annotated image to a byte stream
         img_byte_arr = io.BytesIO()
