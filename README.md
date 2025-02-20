@@ -9,13 +9,23 @@
 After pulling the repo, run the following: 
 
 ```
-docker build --no-cache -t yolo-api .
+docker build --no-cache -t lucidplantspace .
 ```
 
-then run the server
+
+Running the following will kick off training of the model from the `/data` folder  if you want to train a specific model, download and unzip to this directory.
 
 ```
-docker run -p 8000:8000 yolo-api
+docker run --rm \                                                                      
+  -v $(pwd)/data:/app/data \
+  -v $(pwd)/models:/app/models \
+  lucidplantspace train --data=/app/data/data.yaml --model=yolov8n.pt --epochs=10 --imgsz=640
+```
+
+Alternatively to just run the server:
+
+```
+docker run -p 8000:8000 lucidplantspace serve
 ```
 
 Once running, requests can be made via the command line:
@@ -26,5 +36,24 @@ curl -X 'POST' \
   -H 'accept: application/json' \
   -H 'Content-Type: multipart/form-data' \
   -F 'file=@<path_to_image.jpg> '
+```
+
+## To test on a device
+
+Create a Personal Hotspot connection to your device, then run the following command
+
+```
+npm run dev -- --host
+```
+
+The following will be displayed which will show addresses that are exposed to the local network: 
+
+```
+ VITE v6.1.1  ready in 61 ms
+
+  ➜  Local:   http://localhost:5173/
+  ➜  Network: http://172.20.10.3:5173/
+  ➜  Network: http://192.168.64.1:5173/
+  ➜  press h + enter to show help
 ```
 
