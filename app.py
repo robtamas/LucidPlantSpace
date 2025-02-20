@@ -6,7 +6,7 @@ import io
 app = FastAPI()
 
 # Load YOLO model
-model = YOLO("yolov8n.pt")  # Default YOLOv8 model
+model = YOLO("/app/models/best.pt")
 
 @app.post("/detect/")
 async def detect_objects(file: UploadFile = File(...)):
