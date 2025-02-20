@@ -1,11 +1,11 @@
 import React, { useState } from "react";
-import { Analysis } from "./models";
+import { Analysis, Details } from "./models";
 import axios from "axios";
 
 function ImageAnalysis() {
   const [image, setImage] = useState(null);
-  const [response, setResponse] = useState("");
   const [responseImage, setResponseImage] = useState("");
+  const [analysisDetails, setAnalysisDetails] = useState<Details[]>();
 
   const handleImageChange = (event) => {
     const file = event.target.files[0];
@@ -30,12 +30,10 @@ function ImageAnalysis() {
     })
       .then(function (response) {
         const analysis = response.data as Analysis;
-
-        const analysisDetails = JSON.stringify(analysis.details, null, 2);
-        setResponse(analysisDetails);
-
         const base64Image = `data:image/png;base64,${analysis.image}`;
+
         setResponseImage(base64Image);
+        setAnalysisDetails(analysis.details);
       })
       .catch(function (error) {
         console.log(error.message);
@@ -48,14 +46,26 @@ function ImageAnalysis() {
       <button onClick={handleUpload} disabled={!image}>
         Upload
       </button>
-      <textarea
-        value={response}
-        readOnly
-        rows={20}
-        cols={50}
-        style={{ marginTop: "10px", width: "100%" }}
-      />
-      {responseImage && <img src={responseImage} alt="response" />}
+      {responseImage && (
+        <div>
+          <img src={responseImage} alt="response" />
+        </div>
+      )}
+      {analysisDetails && (
+        <div>
+          <h2>Details</h2>
+          {analysisDetails.map((detail) => (
+            <ul>
+              <li>Type: {detail.type}</li>
+              <li>
+                Confidence: {Number((detail.confidence * 100).toFixed(2))}%
+              </li>
+              <li>Date: {detail.date}</li>
+              <li>Action: {detail.action}</li>
+            </ul>
+          ))}
+        </div>
+      )}
     </div>
   );
 }

@@ -12,7 +12,7 @@ export type Prediction = {
 };
 
 export type Analysis = {
-  details: Details;
+  details: Details[];
   image: string;
 };
 
