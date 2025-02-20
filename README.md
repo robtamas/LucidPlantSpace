@@ -13,12 +13,14 @@ docker build --no-cache -t lucidplantspace .
 ```
 
 
-By default running the following will kick off training of the model from the `/data` folder  if you want to train a specific model, download and unzip to this directory.
+Running the following will kick off training of the model from the `/data` folder  if you want to train a specific model, download and unzip to this directory.
 
 ```
-docker run -p 8000:8000 lucidplantspace
+docker run --rm \                                                                      
+  -v $(pwd)/data:/app/data \
+  -v $(pwd)/models:/app/models \
+  lucidplantspace train --data=/app/data/data.yaml --model=yolov8n.pt --epochs=10 --imgsz=640
 ```
-
 
 Alternatively to just run the server:
 
