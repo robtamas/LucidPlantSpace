@@ -5,7 +5,7 @@ import axios from "axios";
 function ImageAnalysis() {
   const [image, setImage] = useState(null);
   const [response, setResponse] = useState("");
-  const [base64Image, setBase64Image] = useState("");
+  const [responseImage, setResponseImage] = useState("");
 
   const handleImageChange = (event) => {
     const file = event.target.files[0];
@@ -20,31 +20,22 @@ function ImageAnalysis() {
     const formData = new FormData();
     formData.append("file", image);
 
-    const reader = new FileReader();
-
-    // Convert the image to base64 once it is loaded
-    reader.onloadend = () => {
-      setBase64Image(reader.result); // Store the base64 string in the state
-    };
-
-    reader.readAsDataURL(image); // Read the image file as a base64 string
-
     axios({
       method: "POST",
       url: "/api/detect/",
-      data: base64Image,
+      data: formData,
       headers: {
         "Content-Type": "application/x-www-form-urlencoded",
       },
     })
       .then(function (response) {
-        //console.log(response.data);
-
-        const jsonString = JSON.stringify(response.data, null, 2);
-        // setResponse(jsonString);
-
         const analysis = response.data as Analysis;
-        setResponse(analysis);
+
+        const analysisDetails = JSON.stringify(analysis.details, null, 2);
+        setResponse(analysisDetails);
+
+        const base64Image = `data:image/png;base64,${analysis.image}`;
+        setResponseImage(base64Image);
       })
       .catch(function (error) {
         console.log(error.message);
@@ -64,6 +55,7 @@ function ImageAnalysis() {
         cols={50}
         style={{ marginTop: "10px", width: "100%" }}
       />
+      {responseImage && <img src={responseImage} alt="response" />}
     </div>
   );
 }
