@@ -10,3 +10,15 @@ export type Prediction = {
   width: number;
   height: number;
 };
+
+export type Analysis = {
+  details: Details;
+  image: string;
+};
+
+export type Details = {
+  confidence: string;
+  type: string;
+  date: string;
+  action: string;
+};
