@@ -1,10 +1,9 @@
 import { useState } from 'react';
 import { Analysis, Details } from './models';
 import axios from 'axios';
-import cameraIcon from './assets/images/camera-solid-white.svg';
-import { addHours, format } from 'date-fns';
 import * as exifr from 'exifr';
 import AnalysisDetails from './components/AnalysisDetails/AnalysisDetails';
+import welcomeImage from './assets/images/slip-haz-sign-pink2.png';
 
 export const buttonStyle = {
 	WebkitBoxAlign: 'center',
@@ -16,14 +15,16 @@ export const buttonStyle = {
 	backgroundColor: 'rgb(27, 131, 139)',
 	color: 'rgb(255, 255, 255)',
 	borderRadius: '0.375rem',
-	padding: '0.375rem 0.5rem',
+	// padding: '0.375rem 0.5rem',
 	width: 'fit-content',
 	// height: 'fit-content',
 	fontFamily: 'Gilroy, Verdana, sans-serif',
-	fontSize: '1rem',
+	fontSize: '1.2rem',
 	fontWeight: 700,
-	// lineHeight: '1.25rem',
-	maxHeight: '40px',
+	lineHeight: '1.5rem',
+	padding: '12px 32px',
+	// maxHeight: '40px',
+	cursor: 'pointer',
 };
 
 function ImageAnalysis() {
@@ -121,12 +122,12 @@ function ImageAnalysis() {
 				flexDirection: 'column',
 				/* max-width: 1280px; */
 				width: '100%',
-				minHeight: '100vh',
+				// minHeight: '100vh',
 				/* max-height: 100vh; */
 				/* overflow: hidden; */
 				// margin: '0 auto',
 				margin: '0 auto',
-				padding: 0,
+				padding: '0',
 				/* text-align: center; */
 			}}
 		>
@@ -135,17 +136,20 @@ function ImageAnalysis() {
 					height: '64px',
 					width: '100%',
 					background: '#056D78',
+					position: 'fixed',
+					left: 0,
+					right: 0,
 				}}
 			>
 				<h1
 					style={{
 						color: 'white',
 						textAlign: 'center',
-						fontSize: '30px',
-						lineHeight: 1,
+						fontSize: '20px',
+						lineHeight: '40px',
 					}}
 				>
-					M.A.D.H.A.T.
+					Hazards
 				</h1>
 			</div>
 
@@ -155,38 +159,114 @@ function ImageAnalysis() {
 					flex: '1 1 auto',
 					width: '100%',
 					background: 'white',
+					overflowX: 'auto',
 				}}
 			>
 				{/* content */}
-				{image && (
-					<img
-						src={displayImage}
-						style={{
-							maxWidth: '80vw',
-							maxHeight: '80vw',
-						}}
-					/>
-				)}
+				<div
+					style={{
+						color: '#2F4051',
+						display: 'flex',
+						alignItems: 'center',
+						justifyContent: 'center',
+						flexDirection: 'column',
+						paddingTop: '64px',
+					}}
+				>
+					{!displayImage && !responseImage && (
+						<div style={{ padding: '8px 24px', textAlign: 'center' }}>
+							<img
+								src={welcomeImage}
+								alt="detect hazard"
+								width="150px"
+								style={{ margin: '42px auto 12px' }}
+							/>
+							<p
+								style={{
+									fontSize: '28px',
+									color: '#056D78',
+									fontWeight: 'bold',
+									margin: '18px 0 0',
+									lineHeight: '1.2',
+								}}
+							>
+								Report hazards
+								<br />
+								quickly & easily
+							</p>
+							<p
+								style={{
+									fontSize: '20px',
+									color: '#2F4051',
+									margin: '24px 0 0',
+									lineHeight: '1.2',
+								}}
+							>
+								Capture critical information
+								<br />
+								about hazards
+							</p>
+						</div>
+					)}
 
-				{responseImage && (
-					<div>
-						<img
-							src={responseImage}
-							alt="response"
-							style={{
-								maxWidth: '80vw',
-								maxHeight: '80vw',
-							}}
+					<div
+						style={{
+							color: '#2F4051',
+							display: 'flex',
+							alignItems: 'center',
+							justifyContent: 'center',
+							flexDirection: 'column',
+							paddingTop: '12px',
+						}}
+					>
+						{image && !responseImage && (
+							<img
+								src={displayImage}
+								style={{
+									maxWidth: '90vw',
+									// maxHeight: '100vw',
+								}}
+							/>
+						)}
+					</div>
+
+					{responseImage && (
+						<div>
+							<img
+								src={responseImage}
+								alt="response"
+								style={{
+									maxWidth: '90vw',
+									// maxHeight: '80vw',
+								}}
+							/>
+						</div>
+					)}
+				</div>
+
+				{analysisDetails && analysisDetails.length > 0 && responseImage && (
+					<div style={{ padding: '0 24px' }}>
+						<AnalysisDetails
+							analysisDetails={analysisDetails}
+							latitude={latitude}
+							longitude={longitude}
 						/>
 					</div>
 				)}
-
-				{analysisDetails && (
-					<AnalysisDetails
-						analysisDetails={analysisDetails}
-						latitude={latitude}
-						longitude={longitude}
-					/>
+				{analysisDetails && analysisDetails.length === 0 && responseImage && (
+					<p
+						style={{
+							fontSize: '32px',
+							color: '#056D78',
+							fontWeight: 'bold',
+							margin: '18px 0 0',
+							lineHeight: '1.2',
+							textAlign: 'center',
+							paddingTop: '12px',
+						}}
+					>
+						No Hazards Detected
+					</p>
 				)}
 			</div>
 
@@ -196,25 +276,16 @@ function ImageAnalysis() {
 					display: 'flex',
 					alignItems: 'center',
 					justifyContent: 'center',
-					height: '64px',
+					height: '100px',
 					width: '100%',
-					background: '#DDE0E3',
+					// background: '#DDE0E3',
 					color: '#2F4051',
 				}}
 			>
-				{!responseImage && (
+				{!displayImage && !responseImage && (
 					<>
 						<label htmlFor="file-upload" style={buttonStyle}>
-							<img
-								src={cameraIcon}
-								alt="Add Image"
-								width="24px"
-								style={{
-									marginRight: '8px',
-									fill: 'white',
-								}}
-							/>
-							Add Photo
+							Take Photo
 						</label>
 						<input
 							id="file-upload"
@@ -225,11 +296,11 @@ function ImageAnalysis() {
 						/>
 					</>
 				)}
-				{/* {responseImage && ( */}
-				<button onClick={handleUpload} disabled={!image} style={buttonStyle}>
-					Use Photo
-				</button>
-				{/* )} */}
+				{displayImage && !responseImage && (
+					<button onClick={handleUpload} disabled={!image} style={buttonStyle}>
+						Report Hazard
+					</button>
+				)}
 			</div>
 		</div>
 	);
