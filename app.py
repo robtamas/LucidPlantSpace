@@ -1,6 +1,6 @@
 from fastapi import FastAPI, UploadFile, File
 from ultralytics import YOLO
-from PIL import Image
+from PIL import Image, ImageOps
 from fastapi.responses import StreamingResponse
 from datetime import datetime
 import io
@@ -18,6 +18,14 @@ async def detect_objects(file: UploadFile = File(...)):
         # Read uploaded image
         image_data = await file.read()
         image = Image.open(io.BytesIO(image_data))
+
+        # # Correct image orientation based on EXIF data
+        image = ImageOps.exif_transpose(image)
+
+        # Ensure image is in RGB mode (YOLO might not work well with RGBA/other modes)
+        if image.mode != "RGB":
+            image = image.convert("RGB")
+
 
         # Perform YOLO detection
         results = model(image)
