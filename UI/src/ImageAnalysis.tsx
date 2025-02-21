@@ -1,6 +1,7 @@
 import React, { useState } from "react";
 import { Analysis, Details } from "./models";
 import axios from "axios";
+import { addHours, format } from "date-fns";
 
 function ImageAnalysis() {
   const [image, setImage] = useState(null);
@@ -60,7 +61,13 @@ function ImageAnalysis() {
               <li>
                 Confidence: {Number((detail.confidence * 100).toFixed(2))}%
               </li>
-              <li>Date: {detail.date}</li>
+              <li>
+                Date:{" "}
+                {format(
+                  addHours(new Date(detail.date), 11),
+                  "dd/MM/yyyy HH:mm:ss"
+                )}
+              </li>
               <li>Action: {detail.action}</li>
             </ul>
           ))}
