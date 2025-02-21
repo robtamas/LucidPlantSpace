@@ -3,6 +3,28 @@ import { Analysis, Details } from './models';
 import axios from 'axios';
 import cameraIcon from './assets/images/camera-solid-white.svg';
 import { addHours, format } from 'date-fns';
+import * as exifr from 'exifr';
+import AnalysisDetails from './components/AnalysisDetails/AnalysisDetails';
+
+export const buttonStyle = {
+	WebkitBoxAlign: 'center',
+	alignItems: 'center',
+	border: 'none',
+	display: 'flex',
+	WebkitBoxPack: 'center',
+	justifyContent: 'center',
+	backgroundColor: 'rgb(27, 131, 139)',
+	color: 'rgb(255, 255, 255)',
+	borderRadius: '0.375rem',
+	padding: '0.375rem 0.5rem',
+	width: 'fit-content',
+	// height: 'fit-content',
+	fontFamily: 'Gilroy, Verdana, sans-serif',
+	fontSize: '1rem',
+	fontWeight: 700,
+	// lineHeight: '1.25rem',
+	maxHeight: '40px',
+};
 
 function ImageAnalysis() {
 	const [image, setImage] = useState(null);
@@ -11,14 +33,55 @@ function ImageAnalysis() {
 	);
 	// const [preResponse, setPreResponse] = useState(null);
 	const [responseImage, setResponseImage] = useState('');
-	const [analysisDetails, setAnalysisDetails] = useState<Details[]>();
+	const [analysisDetails, setAnalysisDetails] = useState<
+		Details[] | undefined
+	>();
+	const [latitude, setLatitude] = useState(null);
+	const [longitude, setLongitude] = useState(null);
 
 	const handleImageChange = (event) => {
 		const file = event.target.files[0];
 		if (file) {
 			setImage(file);
+			getLatLongFromImage(file);
 			setDisplayImage(URL.createObjectURL(file));
 		}
+	};
+
+	const getLatLongFromImage = (file: File) => {
+		if (file) {
+			exifr
+				.parse(file, [
+					'GPSLatitude',
+					'GPSLongitude',
+					'GPSLatitudeRef',
+					'GPSLongitudeRef',
+				])
+				.then((metadata) => {
+					if (metadata?.GPSLatitude && metadata?.GPSLongitude) {
+						setLatitude(
+							convertDMSToDD(metadata.GPSLatitude, metadata.GPSLatitudeRef)
+						);
+						setLongitude(
+							convertDMSToDD(metadata.GPSLongitude, metadata.GPSLongitudeRef)
+						);
+					}
+				})
+				.catch((error) => console.error('Error reading HEIC metadata:', error));
+		}
+	};
+
+	const convertDMSToDD = (dmsArray: number[], direction: string): number => {
+		const degrees = dmsArray[0];
+		const minutes = dmsArray[1] / 60;
+		const seconds = dmsArray[2] / 3600;
+		let decimal = degrees + minutes + seconds;
+
+		if (direction === 'S' || direction === 'W') {
+			decimal *= -1;
+		}
+
+		return decimal;
 	};
 
 	const handleUpload = () => {
@@ -105,10 +168,6 @@ function ImageAnalysis() {
 					/>
 				)}
 
-				<button onClick={handleUpload} disabled={!image}>
-					Use Photo
-				</button>
-
 				{responseImage && (
 					<div>
 						<img
@@ -123,41 +182,20 @@ function ImageAnalysis() {
 				)}
 
 				{analysisDetails && (
-					<div>
-						<h2>Details</h2>
-						{analysisDetails.map((detail) => (
-							<ul>
-								<li>Type: {detail.type}</li>
-								<li>
-									Confidence: {Number((detail.confidence * 100).toFixed(2))}%
-								</li>
-								<li>
-									Date:{' '}
-									{format(
-										addHours(new Date(detail.date), 11),
-										'dd/MM/yyyy HH:mm:ss'
-									)}
-								</li>
-								<li>
-									Action Required: {detail.action.title}
-									<p>
-										<strong>{detail.action.description}</strong>
-										<ul>
-											{detail.action.steps.map((step) => (
-												<li>{step}</li>
-											))}
-										</ul>
-									</p>
-								</li>
-							</ul>
-						))}
-					</div>
+					<AnalysisDetails
+						analysisDetails={analysisDetails}
+						latitude={latitude}
+						longitude={longitude}
+					/>
 				)}
 			</div>
 
 			{/* footer */}
 			<div
 				style={{
+					display: 'flex',
+					alignItems: 'center',
+					justifyContent: 'center',
 					height: '64px',
 					width: '100%',
 					background: '#DDE0E3',
@@ -166,27 +204,7 @@ function ImageAnalysis() {
 			>
 				{!responseImage && (
 					<>
-						<label
-							htmlFor="file-upload"
-							style={{
-								WebkitBoxAlign: 'center',
-								alignItems: 'center',
-								border: 'none',
-								display: 'flex',
-								WebkitBoxPack: 'center',
-								justifyContent: 'center',
-								backgroundColor: 'rgb(27, 131, 139)',
-								color: 'rgb(255, 255, 255)',
-								borderRadius: '0.375rem',
-								padding: '0.375rem 0.5rem',
-								width: 'fit-content',
-								height: 'fit-content',
-								fontFamily: 'Gilroy, Verdana, sans-serif',
-								fontSize: '1rem',
-								fontWeight: 700,
-								lineHeight: '1.25rem',
-							}}
-						>
+						<label htmlFor="file-upload" style={buttonStyle}>
 							<img
 								src={cameraIcon}
 								alt="Add Image"
@@ -207,6 +225,11 @@ function ImageAnalysis() {
 						/>
 					</>
 				)}
+				{/* {responseImage && ( */}
+				<button onClick={handleUpload} disabled={!image} style={buttonStyle}>
+					Use Photo
+				</button>
+				{/* )} */}
 			</div>
 		</div>
 	);
