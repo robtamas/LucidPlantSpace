@@ -68,7 +68,17 @@ function ImageAnalysis() {
                   "dd/MM/yyyy HH:mm:ss"
                 )}
               </li>
-              <li>Action: {detail.action}</li>
+              <li>
+                Action Required: {detail.action.title}
+                <p>
+                  <strong>{detail.action.description}</strong>
+                  <ul>
+                    {detail.action.steps.map((step) => (
+                      <li>{step}</li>
+                    ))}
+                  </ul>
+                </p>
+              </li>
             </ul>
           ))}
         </div>
