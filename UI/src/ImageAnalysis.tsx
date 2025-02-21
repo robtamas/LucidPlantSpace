@@ -2,17 +2,57 @@ import React, { useState } from "react";
 import { Analysis, Details } from "./models";
 import axios from "axios";
 import { addHours, format } from "date-fns";
+import * as exifr from "exifr";
 
 function ImageAnalysis() {
   const [image, setImage] = useState(null);
   const [responseImage, setResponseImage] = useState("");
   const [analysisDetails, setAnalysisDetails] = useState<Details[]>();
+  const [latitude, setLatitude] = useState(null);
+  const [longitude, setLongitude] = useState(null);
 
   const handleImageChange = (event) => {
     const file = event.target.files[0];
     if (file) {
       setImage(file);
+      getLatLongFromImage(file);
     }
+  };
+
+  const getLatLongFromImage = (file: File) => {
+    if (file) {
+      exifr
+        .parse(file, [
+          "GPSLatitude",
+          "GPSLongitude",
+          "GPSLatitudeRef",
+          "GPSLongitudeRef",
+        ])
+        .then((metadata) => {
+          if (metadata?.GPSLatitude && metadata?.GPSLongitude) {
+            setLatitude(
+              convertDMSToDD(metadata.GPSLatitude, metadata.GPSLatitudeRef)
+            );
+            setLongitude(
+              convertDMSToDD(metadata.GPSLongitude, metadata.GPSLongitudeRef)
+            );
+          }
+        })
+        .catch((error) => console.error("Error reading HEIC metadata:", error));
+    }
+  };
+
+  const convertDMSToDD = (dmsArray: number[], direction: string): number => {
+    const degrees = dmsArray[0];
+    const minutes = dmsArray[1] / 60;
+    const seconds = dmsArray[2] / 3600;
+    let decimal = degrees + minutes + seconds;
+
+    if (direction === "S" || direction === "W") {
+      decimal *= -1;
+    }
+
+    return decimal;
   };
 
   const handleUpload = () => {
@@ -68,6 +108,12 @@ function ImageAnalysis() {
                   "dd/MM/yyyy HH:mm:ss"
                 )}
               </li>
+              {latitude && longitude && (
+                <>
+                  <li>Latitude: {latitude}</li>
+                  <li>Longitude: {longitude}</li>
+                </>
+              )}
               <li>
                 Action Required: {detail.action.title}
                 <p>
