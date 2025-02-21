@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Analysis, Details } from './models';
 import axios from 'axios';
 import cameraIcon from './assets/images/camera-solid-white.svg';
+import { addHours, format } from 'date-fns';
 
 function ImageAnalysis() {
 	const [image, setImage] = useState(null);
@@ -130,8 +131,24 @@ function ImageAnalysis() {
 								<li>
 									Confidence: {Number((detail.confidence * 100).toFixed(2))}%
 								</li>
-								<li>Date: {detail.date}</li>
-								<li>Action: {detail.action}</li>
+								<li>
+									Date:{' '}
+									{format(
+										addHours(new Date(detail.date), 11),
+										'dd/MM/yyyy HH:mm:ss'
+									)}
+								</li>
+								<li>
+									Action Required: {detail.action.title}
+									<p>
+										<strong>{detail.action.description}</strong>
+										<ul>
+											{detail.action.steps.map((step) => (
+												<li>{step}</li>
+											))}
+										</ul>
+									</p>
+								</li>
 							</ul>
 						))}
 					</div>

@@ -29,12 +29,14 @@ async def detect_objects(file: UploadFile = File(...)):
         # All detections with confidence above threshold
         result = results[0]
 
+        action = {"title": "All spill response and cleanup actions must adhere to the Occupational Safety and Health regulations", "description": "Containment and Cleanup", "steps": ["Use appropriate personal protective equipment (PPE) before handling any spilled substance.", "Contain the spill using absorbent materials, barriers, or spill containment kits.", "Clean the area using approved methods, ensuring proper disposal of contaminated materials."]}
+
         # All detections with confidence above threshold
         boxes = []
         details = []
         for box in result.boxes:
             if box.conf >= confidence_threshold:
-                details.append({"confidence": box.conf.item(), "type": model.names[int(box.cls)], "date": current_time, "action": "Clean it up mate!"})
+                details.append({"confidence": box.conf.item(), "type": model.names[int(box.cls)], "date": current_time, "action": action})
                 boxes.append(box)
 
         result.boxes = boxes
